@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Service business logic.
+ *
+ * Mengestimasi dampak perubahan kebiasaan berdasarkan perbandingan histori check-in dan kondisi skenario.
+ */
+
 namespace App\Services;
 
 use App\Models\DailyCheckin;
@@ -8,6 +14,14 @@ use App\Models\WhatIfScenario;
 
 class WhatIfSimulatorService
 {
+    /**
+     * Mengestimasi perubahan metric jika user menerapkan satu kebiasaan.
+     *
+     * Baseline dihitung dari seluruh histori check-in, lalu dibandingkan
+     * dengan hari yang memenuhi kondisi skenario, misalnya tidur minimal 7.5
+     * jam. Jika belum ada sampel yang cocok, fallback deterministic dipakai
+     * agar UI tetap mendapat estimasi; hasil disimpan sebagai audit simulasi.
+     */
     /**
      * Run deterministic habit simulator based on user historical check-ins
      */
@@ -30,8 +44,8 @@ class WhatIfSimulatorService
                 'target_metric' => 'energy',
                 'target_metric_label' => 'Tingkat Energi Harian',
                 'unit' => '%',
-                'filter_condition' => fn($c) => ($c->signal?->sleep_hours ?? 0) >= 7.5,
-                'baseline_fn' => fn($c) => $c->signal?->energy_level ?? 50,
+                'filter_condition' => fn ($c) => ($c->signal?->sleep_hours ?? 0) >= 7.5,
+                'baseline_fn' => fn ($c) => $c->signal?->energy_level ?? 50,
                 'explanation' => 'Berdasarkan hari-hari di mana kamu tidur minimal 7.5 jam, energimu menunjukkan peningkatan nyata dibanding hari biasa.',
             ],
             'physical_activity_20m' => [
@@ -39,8 +53,8 @@ class WhatIfSimulatorService
                 'target_metric' => 'mood',
                 'target_metric_label' => 'Kestabilan Mood & Mental',
                 'unit' => '%',
-                'filter_condition' => fn($c) => ($c->signal?->physical_activity_min ?? 0) >= 20,
-                'baseline_fn' => fn($c) => $c->signal?->mood_level ?? 50,
+                'filter_condition' => fn ($c) => ($c->signal?->physical_activity_min ?? 0) >= 20,
+                'baseline_fn' => fn ($c) => $c->signal?->mood_level ?? 50,
                 'explanation' => 'Gerakan fisik ringan $\ge$ 20 menit konsisten membantu meningkatkan suasana hatimu dan mengurangi ketegangan pikiran.',
             ],
             'reduce_workload' => [
@@ -48,8 +62,8 @@ class WhatIfSimulatorService
                 'target_metric' => 'stress',
                 'target_metric_label' => 'Tingkat Stres',
                 'unit' => '%',
-                'filter_condition' => fn($c) => ($c->signal?->workload_score ?? 100) <= 50,
-                'baseline_fn' => fn($c) => $c->signal?->stress_level ?? 50,
+                'filter_condition' => fn ($c) => ($c->signal?->workload_score ?? 100) <= 50,
+                'baseline_fn' => fn ($c) => $c->signal?->stress_level ?? 50,
                 'is_lower_better' => true,
                 'explanation' => 'Saat beban kerja berada di level terkontrol, tingkat stresmu tercatat jauh lebih rendah secara historis.',
             ],
@@ -58,19 +72,21 @@ class WhatIfSimulatorService
                 'target_metric' => 'overall',
                 'target_metric_label' => 'Skor Kesejahteraan Keseluruhan',
                 'unit' => 'poin',
-                'filter_condition' => fn($c) => ($c->signal?->social_interaction_score ?? 0) >= 70,
-                'baseline_fn' => fn($c) => $c->overall_wellbeing_score,
+                'filter_condition' => fn ($c) => ($c->signal?->social_interaction_score ?? 0) >= 70,
+                'baseline_fn' => fn ($c) => $c->overall_wellbeing_score,
                 'explanation' => 'Terhubung dengan orang-orang terpercaya terbukti memberi suntikan emosional positif bagi kesejahteraan hidupmu.',
             ],
         ];
 
         $config = $scenariosConfig[$variableChange] ?? $scenariosConfig['sleep_plus_1h'];
 
-        // 1. Calculate Baseline (All historical days)
+        // Baseline memakai semua hari yang tersedia agar pembanding mewakili
+        // kondisi umum user, bukan hanya hari baik atau hari buruk tertentu.
         $baselineValues = $allCheckins->map($config['baseline_fn'])->filter();
         $baselineAverage = $baselineValues->count() > 0 ? round($baselineValues->avg(), 1) : 50.0;
 
-        // 2. Calculate Scenario Value (Filtered historical days where condition was met)
+        // Nilai skenario memakai hari historis ketika kebiasaan target sudah
+        // terjadi. Ini membuat estimasi berbasis pengalaman user sendiri.
         $matchingCheckins = $allCheckins->filter($config['filter_condition']);
         $matchingValues = $matchingCheckins->map($config['baseline_fn'])->filter();
 
@@ -78,8 +94,9 @@ class WhatIfSimulatorService
             $projectedAverage = round($matchingValues->avg(), 1);
             $sampleDaysCount = $matchingValues->count();
         } else {
-            // If user doesn't have exact matching days yet, calculate deterministic theoretical model
-            $projectedAverage = isset($config['is_lower_better']) && $config['is_lower_better'] 
+            // Belum ada sampel cocok, jadi gunakan model teoritis tetap dengan
+            // batas 15-95 agar hasil tidak menjadi terlalu ekstrem.
+            $projectedAverage = isset($config['is_lower_better']) && $config['is_lower_better']
                 ? max(15, round($baselineAverage * 0.75, 1))
                 : min(95, round($baselineAverage * 1.22, 1));
             $sampleDaysCount = 0;
@@ -88,7 +105,8 @@ class WhatIfSimulatorService
         $potentialDelta = round($projectedAverage - $baselineAverage, 1);
         $potentialDeltaPercent = $baselineAverage > 0 ? round(($potentialDelta / $baselineAverage) * 100, 1) : 0;
 
-        // Save scenario record
+        // Simpan hasil agar histori simulasi dan konteks analisis tetap dapat
+        // dilacak setelah response dikirim ke PatternController.
         WhatIfScenario::create([
             'user_id' => $user->id,
             'target_metric' => $config['target_metric'],

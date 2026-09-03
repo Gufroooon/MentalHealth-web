@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Seeder data awal/demo.
+ *
+ * Menjelaskan tanggung jawab file database/seeders/RecoveryActivitySeeder.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+ */
+
 namespace Database\Seeders;
 
 use App\Models\RecoveryActivity;

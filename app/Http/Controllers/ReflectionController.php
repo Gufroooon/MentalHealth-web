@@ -1,8 +1,13 @@
 <?php
 
+/**
+ * Dokumentasi file: Controller HTTP.
+ *
+ * Menjelaskan tanggung jawab file app/Http/Controllers/ReflectionController.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+ */
+
 namespace App\Http\Controllers;
 
-use App\Models\DailyCheckin;
 use App\Models\KnowledgeBaseRule;
 use App\Services\KnowledgeReflectionService;
 use App\Services\LifeSignalService;
@@ -16,6 +21,10 @@ class ReflectionController extends Controller
         protected LifeSignalService $lifeSignalService
     ) {}
 
+    /**
+     * Menyiapkan rule refleksi, check-in terbaru, histori jurnal, dan daftar
+     * kategori untuk ditampilkan sebagai ruang refleksi privat.
+     */
     public function index(Request $request)
     {
         $user = Auth::user();
@@ -44,7 +53,8 @@ class ReflectionController extends Controller
     }
 
     /**
-     * Save user's reflection journal
+     * Memvalidasi respons refleksi lalu menyimpannya melalui service.
+     * Rule id dan snapshot prompt menjaga jawaban tetap terkait konteksnya.
      */
     public function store(Request $request)
     {

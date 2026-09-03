@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Controller HTTP.
+ *
+ * Menjelaskan tanggung jawab file app/Http/Controllers/CircleController.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+ */
+
 namespace App\Http\Controllers;
 
 use App\Models\SupportCircle;
@@ -11,13 +17,17 @@ use Illuminate\Support\Facades\Auth;
 
 class CircleController extends Controller
 {
+    /**
+     * Menyiapkan circle user, daftar member, dan sepuluh ping terbaru untuk UI.
+     * firstOrCreate memastikan wadah circle tersedia sebelum data dibaca.
+     */
     public function index()
     {
         $user = Auth::user();
-        
+
         $circle = SupportCircle::firstOrCreate(
             ['user_id' => $user->id],
-            ['circle_name' => 'Lingkaran Aman ' . $user->name]
+            ['circle_name' => 'Lingkaran Aman '.$user->name]
         );
 
         $members = $circle->members()->orderBy('created_at', 'desc')->get();
@@ -27,7 +37,8 @@ class CircleController extends Controller
     }
 
     /**
-     * Store new trusted contact member
+     * Memvalidasi lalu menambahkan kontak terpercaya ke circle user.
+     * Relationship circle->members otomatis mengisi foreign key circle.
      */
     public function storeMember(Request $request)
     {
@@ -47,7 +58,8 @@ class CircleController extends Controller
     }
 
     /**
-     * Delete contact member
+     * Menghapus member setelah ownership circle diverifikasi agar kontak user
+     * lain tidak dapat dihapus melalui route model binding.
      */
     public function destroyMember(SupportCircleMember $member)
     {
@@ -56,6 +68,7 @@ class CircleController extends Controller
         }
 
         $member->delete();
+
         return redirect()->route('circle.index')->with('success', 'Kontak berhasil dihapus dari lingkaran.');
     }
 
@@ -85,6 +98,6 @@ class CircleController extends Controller
             $m->update(['last_pinged_at' => Carbon::now()]);
         }
 
-        return redirect()->route('circle.index')->with('success', 'Sinyal support terkirim ke ' . $activeMembers->count() . ' kontak terpercayamu secara privat dan aman.');
+        return redirect()->route('circle.index')->with('success', 'Sinyal support terkirim ke '.$activeMembers->count().' kontak terpercayamu secara privat dan aman.');
     }
 }

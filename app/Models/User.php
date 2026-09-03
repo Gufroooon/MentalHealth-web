@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Model Eloquent domain.
+ *
+ * Menjelaskan tanggung jawab file app/Models/User.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+ */
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -32,6 +38,9 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Relationship satu-ke-satu dengan Profile milik user. Profile menyimpan preferensi dan status role yang melengkapi data autentikasi User.
+     */
     public function profile(): HasOne
     {
         return $this->hasOne(Profile::class);

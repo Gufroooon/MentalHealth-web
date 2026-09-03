@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Service business logic.
+ *
+ * Menyusun profil pemulihan user dari aktivitas yang tersedia dan histori sesi yang pernah dicatat.
+ */
+
 namespace App\Services;
 
 use App\Models\RecoveryActivity;
@@ -9,7 +15,10 @@ use App\Models\User;
 class RecoveryService
 {
     /**
-     * Get user's dynamic recovery profile ranking activities by average efficacy
+     * Membuat ranking aktivitas recovery berdasarkan dampak historis user.
+     * Relationship sessions dibatasi user_id agar statistik tidak tercampur.
+     * Dampak total adalah rata-rata dari perubahan energi dan mood, kemudian
+     * aktivitas diurutkan dari dampak terbesar dan jumlah sampel terbanyak.
      */
     public function getRecoveryProfile(User $user): array
     {
@@ -24,8 +33,8 @@ class RecoveryService
             $count = $sessions->count();
 
             if ($count > 0) {
-                $avgEnergyDelta = round($sessions->avg(fn($s) => $s->energy_after - $s->energy_before), 1);
-                $avgMoodDelta = round($sessions->avg(fn($s) => $s->mood_after - $s->mood_before), 1);
+                $avgEnergyDelta = round($sessions->avg(fn ($s) => $s->energy_after - $s->energy_before), 1);
+                $avgMoodDelta = round($sessions->avg(fn ($s) => $s->mood_after - $s->mood_before), 1);
                 $totalImpactScore = round(($avgEnergyDelta * 0.5) + ($avgMoodDelta * 0.5), 1);
             } else {
                 $avgEnergyDelta = null;
@@ -47,15 +56,18 @@ class RecoveryService
             ];
         }
 
-        // Sort by total impact score descending, then sessions count
+        // Aktivitas paling berdampak ditampilkan lebih dulu; jumlah sesi menjadi
+        // tie-breaker karena sampel lebih banyak memberi konteks tambahan.
         usort($rankedActivities, function ($a, $b) {
             if ($b['total_impact_score'] == $a['total_impact_score']) {
                 return $b['sessions_count'] <=> $a['sessions_count'];
             }
+
             return $b['total_impact_score'] <=> $a['total_impact_score'];
         });
 
-        // Recent sessions
+        // Histori terbaru dipakai UI untuk menunjukkan eksperimen recovery yang
+        // baru dilakukan user, tanpa mengambil sesi milik akun lain.
         $recentSessions = RecoverySession::with('activity')
             ->where('user_id', $user->id)
             ->orderBy('created_at', 'desc')
@@ -70,7 +82,8 @@ class RecoveryService
     }
 
     /**
-     * Record a new recovery session
+     * Menyimpan satu sesi recovery dan perubahan energi/mood sebelum-sesudahnya.
+     * Data berasal dari form Recovery Lab dan digunakan pada ranking berikutnya.
      */
     public function logSession(User $user, array $data): RecoverySession
     {

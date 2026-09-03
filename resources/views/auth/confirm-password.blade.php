@@ -1,3 +1,8 @@
+{{--
+    Dokumentasi file: View Blade.
+
+    Menjelaskan tanggung jawab file resources/views/auth/confirm-password.blade.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+--}}
 <x-guest-layout>
     <div class="mb-4 text-sm text-gray-600">
         {{ __('This is a secure area of the application. Please confirm your password before continuing.') }}

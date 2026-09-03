@@ -1,13 +1,18 @@
 <?php
 
+/**
+ * Dokumentasi file: Test aplikasi.
+ *
+ * Menjelaskan tanggung jawab file tests/Feature/NaraModulesTest.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+ */
+
 namespace Tests\Feature;
 
-use App\Models\DailyCheckin;
 use App\Models\KnowledgeBaseRule;
 use App\Models\MicroActionLog;
 use App\Models\RecoveryActivity;
-use App\Models\SupportCircle;
 use App\Models\User;
+use App\Services\ChatService;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -173,7 +178,7 @@ class NaraModulesTest extends TestCase
 
     public function test_chat_service_correctly_handles_statements_qa_and_quizzes()
     {
-        $chatService = app(\App\Services\ChatService::class);
+        $chatService = app(ChatService::class);
 
         // 1. Pernyataan emosi langsung
         $resSedih = $chatService->respond($this->user, 'aku lagi sedih banget');
@@ -209,5 +214,3 @@ class NaraModulesTest extends TestCase
         $this->assertEquals('reflection_quiz_question', $resKuiz['nara_message']->intent_detected);
     }
 }
-
-

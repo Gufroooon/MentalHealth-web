@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: FormRequest validasi dan otorisasi.
+ *
+ * Menjelaskan tanggung jawab file app/Http/Requests/ProfileUpdateRequest.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+ */
+
 namespace App\Http\Requests;
 
 use App\Models\User;

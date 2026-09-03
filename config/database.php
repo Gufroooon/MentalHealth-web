@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Konfigurasi Laravel.
+ *
+ * Menjelaskan tanggung jawab file config/database.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+ */
+
 use Illuminate\Support\Str;
 use Pdo\Mysql;
 

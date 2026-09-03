@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Entry point aplikasi.
+ *
+ * Menjelaskan tanggung jawab file public/index.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+ */
+
 use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 

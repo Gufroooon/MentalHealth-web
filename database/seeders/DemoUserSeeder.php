@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Seeder data awal/demo.
+ *
+ * Menjelaskan tanggung jawab file database/seeders/DemoUserSeeder.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+ */
+
 namespace Database\Seeders;
 
 use App\Models\DailyCheckin;
@@ -76,25 +82,25 @@ class DemoUserSeeder extends Seeder
         // Days 14 to 8: Normal/Good baseline (sleep ~7.5h, stress ~35, energy ~75)
         // Days 7 to 4: Deadline impact period (sleep ~5.0h, stress ~80, energy ~45, workload ~85)
         // Days 3 to 0 (today): Recovery phase (sleep ~6.8h, stress ~45, energy ~65)
-        
+
         $historicalData = [
             14 => ['sleep' => 7.8, 'sleep_q' => 80, 'act' => 30, 'energy' => 78, 'stress' => 30, 'focus' => 75, 'overthink' => 25, 'mood' => 80, 'social' => 75, 'lonely' => 20, 'friction' => 10, 'work' => 40, 'fin' => 30, 'goal' => 75, 'notes' => 'Hari tenang, sempat jalan sore.'],
             13 => ['sleep' => 7.5, 'sleep_q' => 75, 'act' => 25, 'energy' => 74, 'stress' => 35, 'focus' => 70, 'overthink' => 30, 'mood' => 75, 'social' => 80, 'lonely' => 15, 'friction' => 10, 'work' => 45, 'fin' => 30, 'goal' => 70, 'notes' => 'Ngopi bareng temen sekelas.'],
             12 => ['sleep' => 7.2, 'sleep_q' => 75, 'act' => 20, 'energy' => 70, 'stress' => 40, 'focus' => 70, 'overthink' => 35, 'mood' => 72, 'social' => 70, 'lonely' => 20, 'friction' => 15, 'work' => 50, 'fin' => 35, 'goal' => 65, 'notes' => 'Mulai persiapan pitch deck.'],
             11 => ['sleep' => 6.2, 'sleep_q' => 65, 'act' => 15, 'energy' => 62, 'stress' => 60, 'focus' => 75, 'overthink' => 50, 'mood' => 65, 'social' => 60, 'lonely' => 25, 'friction' => 15, 'work' => 75, 'fin' => 35, 'goal' => 70, 'notes' => 'Latihan presentasi sampai larut.'],
             10 => ['sleep' => 6.5, 'sleep_q' => 70, 'act' => 20, 'energy' => 68, 'stress' => 55, 'focus' => 80, 'overthink' => 40, 'mood' => 78, 'social' => 75, 'lonely' => 15, 'friction' => 10, 'work' => 65, 'fin' => 30, 'goal' => 85, 'notes' => 'Presentasi sukses dipuji mentor!'],
-            9  => ['sleep' => 7.5, 'sleep_q' => 80, 'act' => 35, 'energy' => 76, 'stress' => 30, 'focus' => 70, 'overthink' => 25, 'mood' => 82, 'social' => 85, 'lonely' => 10, 'friction' => 5,  'work' => 40, 'fin' => 30, 'goal' => 80, 'notes' => 'Weekend rehat santai.'],
-            8  => ['sleep' => 8.0, 'sleep_q' => 85, 'act' => 40, 'energy' => 80, 'stress' => 25, 'focus' => 75, 'overthink' => 20, 'mood' => 85, 'social' => 80, 'lonely' => 10, 'friction' => 5,  'work' => 35, 'fin' => 30, 'goal' => 75, 'notes' => 'Tidur nyenyak banget.'],
-            
+            9 => ['sleep' => 7.5, 'sleep_q' => 80, 'act' => 35, 'energy' => 76, 'stress' => 30, 'focus' => 70, 'overthink' => 25, 'mood' => 82, 'social' => 85, 'lonely' => 10, 'friction' => 5,  'work' => 40, 'fin' => 30, 'goal' => 80, 'notes' => 'Weekend rehat santai.'],
+            8 => ['sleep' => 8.0, 'sleep_q' => 85, 'act' => 40, 'energy' => 80, 'stress' => 25, 'focus' => 75, 'overthink' => 20, 'mood' => 85, 'social' => 80, 'lonely' => 10, 'friction' => 5,  'work' => 35, 'fin' => 30, 'goal' => 75, 'notes' => 'Tidur nyenyak banget.'],
+
             // Period 2: Deadline week
-            7  => ['sleep' => 6.0, 'sleep_q' => 60, 'act' => 10, 'energy' => 58, 'stress' => 65, 'focus' => 65, 'overthink' => 55, 'mood' => 60, 'social' => 50, 'lonely' => 30, 'friction' => 20, 'work' => 78, 'fin' => 40, 'goal' => 60, 'notes' => 'Pengumuman deadline dimajukan.'],
-            6  => ['sleep' => 5.2, 'sleep_q' => 50, 'act' => 5,  'energy' => 48, 'stress' => 78, 'focus' => 60, 'overthink' => 70, 'mood' => 52, 'social' => 40, 'lonely' => 45, 'friction' => 25, 'work' => 88, 'fin' => 45, 'goal' => 55, 'notes' => 'Ngebut coding tugas kelompok.'],
-            5  => ['sleep' => 4.8, 'sleep_q' => 40, 'act' => 5,  'energy' => 42, 'stress' => 85, 'focus' => 55, 'overthink' => 75, 'mood' => 45, 'social' => 35, 'lonely' => 50, 'friction' => 30, 'work' => 92, 'fin' => 45, 'goal' => 50, 'notes' => 'Begadang bareng tim, pusing.'],
-            4  => ['sleep' => 5.5, 'sleep_q' => 50, 'act' => 10, 'energy' => 50, 'stress' => 75, 'focus' => 65, 'overthink' => 65, 'mood' => 55, 'social' => 50, 'lonely' => 35, 'friction' => 20, 'work' => 85, 'fin' => 40, 'goal' => 65, 'notes' => 'Tugas terkirim tepat waktu, lega tapi tepar.'],
-            3  => ['sleep' => 7.0, 'sleep_q' => 70, 'act' => 20, 'energy' => 64, 'stress' => 48, 'focus' => 68, 'overthink' => 40, 'mood' => 68, 'social' => 65, 'lonely' => 25, 'friction' => 10, 'work' => 50, 'fin' => 35, 'goal' => 65, 'notes' => 'Mulai tidur lebih teratur.'],
-            2  => ['sleep' => 7.2, 'sleep_q' => 75, 'act' => 25, 'energy' => 70, 'stress' => 40, 'focus' => 72, 'overthink' => 35, 'mood' => 74, 'social' => 70, 'lonely' => 20, 'friction' => 10, 'work' => 45, 'fin' => 30, 'goal' => 70, 'notes' => 'Jalan sore 25 menit keliling komplek.'],
-            1  => ['sleep' => 7.4, 'sleep_q' => 78, 'act' => 20, 'energy' => 72, 'stress' => 38, 'focus' => 75, 'overthink' => 30, 'mood' => 76, 'social' => 75, 'lonely' => 18, 'friction' => 10, 'work' => 42, 'fin' => 30, 'goal' => 72, 'notes' => 'Kemarin ngerasa jauh lebih segar.'],
-            0  => ['sleep' => 7.5, 'sleep_q' => 80, 'act' => 25, 'energy' => 75, 'stress' => 35, 'focus' => 78, 'overthink' => 28, 'mood' => 80, 'social' => 78, 'lonely' => 15, 'friction' => 5,  'work' => 40, 'fin' => 30, 'goal' => 75, 'notes' => 'Hari ini ritme hidup mulai stabil kembali.'],
+            7 => ['sleep' => 6.0, 'sleep_q' => 60, 'act' => 10, 'energy' => 58, 'stress' => 65, 'focus' => 65, 'overthink' => 55, 'mood' => 60, 'social' => 50, 'lonely' => 30, 'friction' => 20, 'work' => 78, 'fin' => 40, 'goal' => 60, 'notes' => 'Pengumuman deadline dimajukan.'],
+            6 => ['sleep' => 5.2, 'sleep_q' => 50, 'act' => 5,  'energy' => 48, 'stress' => 78, 'focus' => 60, 'overthink' => 70, 'mood' => 52, 'social' => 40, 'lonely' => 45, 'friction' => 25, 'work' => 88, 'fin' => 45, 'goal' => 55, 'notes' => 'Ngebut coding tugas kelompok.'],
+            5 => ['sleep' => 4.8, 'sleep_q' => 40, 'act' => 5,  'energy' => 42, 'stress' => 85, 'focus' => 55, 'overthink' => 75, 'mood' => 45, 'social' => 35, 'lonely' => 50, 'friction' => 30, 'work' => 92, 'fin' => 45, 'goal' => 50, 'notes' => 'Begadang bareng tim, pusing.'],
+            4 => ['sleep' => 5.5, 'sleep_q' => 50, 'act' => 10, 'energy' => 50, 'stress' => 75, 'focus' => 65, 'overthink' => 65, 'mood' => 55, 'social' => 50, 'lonely' => 35, 'friction' => 20, 'work' => 85, 'fin' => 40, 'goal' => 65, 'notes' => 'Tugas terkirim tepat waktu, lega tapi tepar.'],
+            3 => ['sleep' => 7.0, 'sleep_q' => 70, 'act' => 20, 'energy' => 64, 'stress' => 48, 'focus' => 68, 'overthink' => 40, 'mood' => 68, 'social' => 65, 'lonely' => 25, 'friction' => 10, 'work' => 50, 'fin' => 35, 'goal' => 65, 'notes' => 'Mulai tidur lebih teratur.'],
+            2 => ['sleep' => 7.2, 'sleep_q' => 75, 'act' => 25, 'energy' => 70, 'stress' => 40, 'focus' => 72, 'overthink' => 35, 'mood' => 74, 'social' => 70, 'lonely' => 20, 'friction' => 10, 'work' => 45, 'fin' => 30, 'goal' => 70, 'notes' => 'Jalan sore 25 menit keliling komplek.'],
+            1 => ['sleep' => 7.4, 'sleep_q' => 78, 'act' => 20, 'energy' => 72, 'stress' => 38, 'focus' => 75, 'overthink' => 30, 'mood' => 76, 'social' => 75, 'lonely' => 18, 'friction' => 10, 'work' => 42, 'fin' => 30, 'goal' => 72, 'notes' => 'Kemarin ngerasa jauh lebih segar.'],
+            0 => ['sleep' => 7.5, 'sleep_q' => 80, 'act' => 25, 'energy' => 75, 'stress' => 35, 'focus' => 78, 'overthink' => 28, 'mood' => 80, 'social' => 78, 'lonely' => 15, 'friction' => 5,  'work' => 40, 'fin' => 30, 'goal' => 75, 'notes' => 'Hari ini ritme hidup mulai stabil kembali.'],
         ];
 
         foreach ($historicalData as $daysAgo => $data) {
@@ -103,7 +109,7 @@ class DemoUserSeeder extends Seeder
             // Calculate 4 vector scores
             // Mind: mood (40%) + focus (30%) + (100 - stress)*15% + (100 - overthink)*15%
             $mindScore = round(($data['mood'] * 0.4) + ($data['focus'] * 0.3) + ((100 - $data['stress']) * 0.15) + ((100 - $data['overthink']) * 0.15), 1);
-            
+
             // Body: sleep_q (35%) + energy (35%) + min(100, act*2) (15%) + min(100, (sleep/8)*100) (15%)
             $sleepDurScore = min(100, ($data['sleep'] / 8.0) * 100);
             $actScore = min(100, $data['act'] * 2.5);

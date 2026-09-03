@@ -1,3 +1,8 @@
+{{--
+    Dokumentasi file: View Blade.
+
+    Menjelaskan tanggung jawab file resources/views/recovery/index.blade.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+--}}
 <x-app-layout>
     <x-slot name="header">
         <div>

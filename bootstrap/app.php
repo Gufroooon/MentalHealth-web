@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Entry point aplikasi.
+ *
+ * Menjelaskan tanggung jawab file bootstrap/app.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+ */
+
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;

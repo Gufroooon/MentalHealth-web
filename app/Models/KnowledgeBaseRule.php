@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Model Eloquent domain.
+ *
+ * Menjelaskan tanggung jawab file app/Models/KnowledgeBaseRule.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+ */
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;

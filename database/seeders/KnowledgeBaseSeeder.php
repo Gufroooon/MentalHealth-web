@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Seeder data awal/demo.
+ *
+ * Menjelaskan tanggung jawab file database/seeders/KnowledgeBaseSeeder.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+ */
+
 namespace Database\Seeders;
 
 use App\Models\KnowledgeBaseRule;
@@ -111,7 +117,7 @@ class KnowledgeBaseSeeder extends Seeder
                 'title' => 'Social Battery Lagi Low / Overstimulated',
                 'trigger_conditions_json' => ['social_interaction_max' => 40, 'energy_max' => 45],
                 'reflection_prompt' => 'Baterai sosialmu kelihatannya lagi butuh di-charge. Mengisolasi diri sejenak untuk istirahat itu bukan egois kok, itu *self-care*.',
-                'guided_question' => 'Apa aktivitas ' . 'me-time' . ' yang paling bisa mengembalikan energimu saat sendirian?',
+                'guided_question' => 'Apa aktivitas '.'me-time'.' yang paling bisa mengembalikan energimu saat sendirian?',
                 'action_title' => 'Quiet Space 15 Menit',
                 'action_suggestion' => 'Matikan notifikasi grup chat selama 1 jam ke depan dan nikmati ketenangan tanpa tuntutan membalas cepat.',
                 'action_suggestion_id' => 'act_social_quiet',
@@ -159,7 +165,7 @@ class KnowledgeBaseSeeder extends Seeder
                 'title' => 'Kombinasi: Kurang Tidur + Beban Kerja Tinggi',
                 'trigger_conditions_json' => ['sleep_hours_max' => 6.0, 'workload_min' => 70],
                 'reflection_prompt' => 'Pola klasik yang sering terjadi: beban kerja tinggi memaksa kita mengorbankan jam tidur. Akibatnya, esok harinya kita butuh usaha 2x lipat untuk fokus.',
-                'guided_question' => 'Bagaimana jika malam ini kamu pasang ' . 'hard stop' . ' jam kerja pada jam 22.00?',
+                'guided_question' => 'Bagaimana jika malam ini kamu pasang '.'hard stop'.' jam kerja pada jam 22.00?',
                 'action_title' => 'Tutup Laptop Tepat Waktu Malam Ini',
                 'action_suggestion' => 'Tentukan jam berhenti kerja malam ini, lalu simpan file tugasmu dan tinggalkan meja kerja.',
                 'action_suggestion_id' => 'act_combo_hard_stop',

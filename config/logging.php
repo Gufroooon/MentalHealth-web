@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Konfigurasi Laravel.
+ *
+ * Menjelaskan tanggung jawab file config/logging.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+ */
+
 use Monolog\Handler\NullHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Handler\SyslogUdpHandler;

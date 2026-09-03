@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Controller HTTP.
+ *
+ * Menjelaskan tanggung jawab file app/Http/Controllers/PatternController.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+ */
+
 namespace App\Http\Controllers;
 
 use App\Models\LifeEvent;
@@ -17,13 +23,18 @@ class PatternController extends Controller
         protected LifeSignalService $lifeSignalService
     ) {}
 
+    /**
+     * Menampilkan insight pola, histori signal, dan simulasi What-If.
+     * Parameter query scenario memilih kebiasaan yang sedang diuji; jika tidak
+     * ada, simulator memakai sleep_plus_1h sebagai skenario default.
+     */
     public function index(Request $request)
     {
         $user = Auth::user();
-        
+
         // 1. Detect patterns & timeline
         $patternData = $this->patternEngine->detectPatterns($user, 30);
-        
+
         // 2. 14-day signal history
         $signalHistory = $this->lifeSignalService->getSignalHistory($user, 14);
 
@@ -43,7 +54,9 @@ class PatternController extends Controller
     }
 
     /**
-     * Run simulation via AJAX or form
+     * Memvalidasi pilihan kebiasaan lalu menjalankan simulator What-If.
+     * Browser AJAX menerima hasil JSON, sedangkan request form diarahkan
+     * kembali ke halaman pattern dengan scenario sebagai query parameter.
      */
     public function simulate(Request $request)
     {
@@ -62,7 +75,9 @@ class PatternController extends Controller
     }
 
     /**
-     * Store new life event
+     * Memvalidasi dan menyimpan event kehidupan milik user yang login.
+     * Event ini menjadi pembanding utama PatternDetectionEngine terhadap
+     * check-in pada hari-hari sebelum agenda berlangsung.
      */
     public function storeEvent(Request $request)
     {
@@ -82,7 +97,8 @@ class PatternController extends Controller
     }
 
     /**
-     * Delete life event
+     * Menghapus event setelah memastikan event tersebut benar-benar milik
+     * user saat ini, lalu mengembalikan user ke timeline pattern.
      */
     public function destroyEvent(LifeEvent $event)
     {
@@ -91,6 +107,7 @@ class PatternController extends Controller
         }
 
         $event->delete();
+
         return redirect()->route('pattern.index')->with('success', 'Agenda hidup berhasil dihapus.');
     }
 }

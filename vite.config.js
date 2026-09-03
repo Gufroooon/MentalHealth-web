@@ -1,3 +1,7 @@
+/**
+ * Konfigurasi bundler frontend. Vite menggabungkan entry CSS dan JavaScript,
+ * memuat plugin Laravel, serta memantau perubahan Blade untuk refresh.
+ */
 import { defineConfig } from 'vite';
 import laravel from 'laravel-vite-plugin';
 

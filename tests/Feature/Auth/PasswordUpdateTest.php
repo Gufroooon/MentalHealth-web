@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Test aplikasi.
+ *
+ * Menjelaskan tanggung jawab file tests/Feature/Auth/PasswordUpdateTest.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+ */
+
 namespace Tests\Feature\Auth;
 
 use App\Models\User;

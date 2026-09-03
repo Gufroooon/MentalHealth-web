@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Entry point aplikasi.
+ *
+ * Menjelaskan tanggung jawab file app/View/Components/AppLayout.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+ */
+
 namespace App\View\Components;
 
 use Illuminate\View\Component;

@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Migration struktur database.
+ *
+ * Menjelaskan tanggung jawab file database/migrations/0001_01_01_000000_create_users_table.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+ */
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

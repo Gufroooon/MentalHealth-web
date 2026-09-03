@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Controller HTTP.
+ *
+ * Menjelaskan tanggung jawab file app/Http/Controllers/PulseController.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+ */
+
 namespace App\Http\Controllers;
 
 use App\Services\PulseService;
@@ -12,6 +18,10 @@ class PulseController extends Controller
         protected PulseService $pulseService
     ) {}
 
+    /**
+     * Memilih filter role dari query string, mengambil agregasi anonim melalui
+     * PulseService, lalu mengirim data tren ke view Pulse.
+     */
     public function index(Request $request)
     {
         $user = Auth::user();

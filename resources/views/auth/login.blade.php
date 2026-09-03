@@ -1,3 +1,8 @@
+{{--
+    Dokumentasi file: View Blade.
+
+    Menjelaskan tanggung jawab file resources/views/auth/login.blade.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+--}}
 <x-guest-layout>
     <div class="mb-6">
         <h2 class="text-xl font-bold text-slate-800">Selamat Datang Kembali</h2>

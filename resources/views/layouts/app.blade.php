@@ -1,3 +1,8 @@
+{{--
+    Dokumentasi file: View Blade.
+
+    Menjelaskan tanggung jawab file resources/views/layouts/app.blade.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+--}}
 <!DOCTYPE html>
 <html lang="id" class="h-full">
     <head>

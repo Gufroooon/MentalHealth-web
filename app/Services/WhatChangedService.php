@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Service business logic.
+ *
+ * Membandingkan rata-rata tujuh hari terakhir dengan minggu sebelumnya untuk menjelaskan perubahan kondisi user.
+ */
+
 namespace App\Services;
 
 use App\Models\DailyCheckin;
@@ -9,24 +15,29 @@ use Carbon\Carbon;
 class WhatChangedService
 {
     /**
-     * Compare current 7-day period (days 0..6) with previous 7-day period (days 7..13)
+     * Membandingkan dua periode tujuh hari untuk menemukan perubahan bermakna.
+     * Data check-in user diambil bersama signal, dirata-ratakan per metrik,
+     * lalu delta persentase dihitung. Perubahan absolut minimal 15 persen
+     * masuk ke alerts dan diberi penjelasan yang mempertimbangkan faktor lain.
      */
     public function analyzeWeeklyChanges(User $user): array
     {
         $today = Carbon::today();
-        
-        // 1. Current 7 Days (Days 0 - 6)
+
+        // Periode sekarang mencakup hari ini dan enam hari sebelumnya.
         $currentPeriodCheckins = DailyCheckin::with('signal')
             ->where('user_id', $user->id)
             ->whereBetween('date', [$today->copy()->subDays(6)->toDateString(), $today->toDateString()])
             ->get();
 
-        // 2. Previous 7 Days (Days 7 - 13)
+        // Periode pembanding berada tepat satu minggu sebelum periode sekarang.
         $previousPeriodCheckins = DailyCheckin::with('signal')
             ->where('user_id', $user->id)
             ->whereBetween('date', [$today->copy()->subDays(13)->toDateString(), $today->copy()->subDays(7)->toDateString()])
             ->get();
 
+        // Tanpa data di salah satu periode, delta tidak dapat dibandingkan
+        // secara adil sehingga service mengembalikan status belum cukup data.
         if ($currentPeriodCheckins->isEmpty() || $previousPeriodCheckins->isEmpty()) {
             return [
                 'has_comparison' => false,
@@ -66,6 +77,8 @@ class WhatChangedService
             $deltaPercent = round((($currVal - $prevVal) / $prevVal) * 100, 1);
             $absDelta = abs($deltaPercent);
 
+            // Ambang 15 persen menyaring fluktuasi kecil agar alert berfokus
+            // pada perubahan yang kemungkinan terasa oleh user.
             $isSignificant = $absDelta >= 15.0;
             $isPositive = $meta['higher_is_better'] ? ($deltaPercent > 0) : ($deltaPercent < 0);
 
@@ -85,18 +98,18 @@ class WhatChangedService
 
             if ($isSignificant) {
                 $direction = $deltaPercent > 0 ? 'meningkat' : 'menurun';
-                
+
                 // Construct friendly empathetic insight
                 $insight = $this->buildEmpatheticInsight($key, $meta['name'], $deltaPercent, $currVal, $prevVal, $currStats, $prevStats);
-                
+
                 $alerts[] = [
                     'key' => $key,
                     'title' => "{$meta['name']} {$direction} {$absDelta}% minggu ini",
                     'delta_percent' => $deltaPercent,
                     'is_positive' => $isPositive,
                     'insight' => $insight,
-                    'current' => round($currVal, 1) . ' ' . $meta['unit'],
-                    'previous' => round($prevVal, 1) . ' ' . $meta['unit'],
+                    'current' => round($currVal, 1).' '.$meta['unit'],
+                    'previous' => round($prevVal, 1).' '.$meta['unit'],
                 ];
             }
         }
@@ -112,10 +125,18 @@ class WhatChangedService
         ];
     }
 
+    /**
+     * Mengubah kumpulan check-in menjadi rata-rata setiap vector dan signal.
+     * Nilai signal hanya dijumlahkan ketika relationship tersedia; pembagian
+     * tetap memakai jumlah check-in agar hasil konsisten dengan periode yang
+     * sedang dibandingkan.
+     */
     private function calculateAverages($checkins): array
     {
         $count = $checkins->count();
-        if ($count === 0) return [];
+        if ($count === 0) {
+            return [];
+        }
 
         $totals = [
             'overall' => 0,
@@ -162,33 +183,40 @@ class WhatChangedService
         return $averages;
     }
 
+    /**
+     * Menyusun kalimat insight berdasarkan metrik yang berubah dan faktor
+     * pendukungnya, misalnya tidur, beban kerja, atau stres. Output ini hanya
+     * penjelasan berbasis data historis, bukan diagnosis medis.
+     */
     private function buildEmpatheticInsight(string $key, string $name, float $delta, float $curr, float $prev, array $currStats, array $prevStats): string
     {
         $factors = [];
 
         if ($key === 'energy' && $delta < 0) {
             if (($currStats['sleep_hours'] ?? 0) < ($prevStats['sleep_hours'] ?? 0)) {
-                $factors[] = "Jam tidur (" . ($prevStats['sleep_hours'] ?? 0) . "j → " . ($currStats['sleep_hours'] ?? 0) . "j)";
+                $factors[] = 'Jam tidur ('.($prevStats['sleep_hours'] ?? 0).'j → '.($currStats['sleep_hours'] ?? 0).'j)';
             }
             if (($currStats['workload'] ?? 0) > ($prevStats['workload'] ?? 0)) {
-                $factors[] = "Beban kerja (" . ($prevStats['workload'] ?? 0) . "% → " . ($currStats['workload'] ?? 0) . "%)";
+                $factors[] = 'Beban kerja ('.($prevStats['workload'] ?? 0).'% → '.($currStats['workload'] ?? 0).'%)';
             }
             if (($currStats['stress'] ?? 0) > ($prevStats['stress'] ?? 0)) {
-                $factors[] = "Tingkat stres (" . ($prevStats['stress'] ?? 0) . "% → " . ($currStats['stress'] ?? 0) . "%)";
+                $factors[] = 'Tingkat stres ('.($prevStats['stress'] ?? 0).'% → '.($currStats['stress'] ?? 0).'%)';
             }
-            
-            $factorsText = !empty($factors) ? implode(', ', $factors) : "fluktuasi aktivitas harian";
+
+            $factorsText = ! empty($factors) ? implode(', ', $factors) : 'fluktuasi aktivitas harian';
+
             return "Energimu mengalami penurunan dibanding minggu lalu. Faktor yang mungkin berkontribusi: {$factorsText}. Tubuhmu mungkin sedang meminta ritme yang lebih santai.";
         }
 
         if ($key === 'stress' && $delta > 0) {
             if (($currStats['workload'] ?? 0) > ($prevStats['workload'] ?? 0)) {
-                $factors[] = "Kepadatan tugas/deadline";
+                $factors[] = 'Kepadatan tugas/deadline';
             }
             if (($currStats['sleep_hours'] ?? 0) < 6.0) {
-                $factors[] = "Kurang jam istirahat";
+                $factors[] = 'Kurang jam istirahat';
             }
-            $factorsText = !empty($factors) ? implode(' dan ', $factors) : "tuntutan mingguan";
+            $factorsText = ! empty($factors) ? implode(' dan ', $factors) : 'tuntutan mingguan';
+
             return "Tingkat stresmu naik {$delta}%. Hal ini mungkin berhubungan dengan {$factorsText}. Jangan lupa luangkan jeda kecil di sela aktivitas.";
         }
 
@@ -200,6 +228,6 @@ class WhatChangedService
             return "Kabar baik! {$name} menunjukkan peningkatan positif (+{$delta}%). Pola istirahat dan kebiasaanmu minggu ini tampaknya berjalan efektif.";
         }
 
-        return "Terjadi perubahan pada {$name} sebesar " . abs($delta) . "% dibanding periode 7 hari sebelumnya.";
+        return "Terjadi perubahan pada {$name} sebesar ".abs($delta).'% dibanding periode 7 hari sebelumnya.';
     }
 }

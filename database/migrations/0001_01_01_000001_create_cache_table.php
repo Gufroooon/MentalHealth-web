@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Migration struktur database.
+ *
+ * Menjelaskan tanggung jawab file database/migrations/0001_01_01_000001_create_cache_table.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+ */
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

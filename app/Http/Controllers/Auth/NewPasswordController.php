@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Controller HTTP.
+ *
+ * Menjelaskan tanggung jawab file app/Http/Controllers/Auth/NewPasswordController.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+ */
+
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;

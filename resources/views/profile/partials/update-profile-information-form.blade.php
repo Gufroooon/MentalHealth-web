@@ -1,3 +1,8 @@
+{{--
+    Dokumentasi file: View Blade.
+
+    Menjelaskan tanggung jawab file resources/views/profile/partials/update-profile-information-form.blade.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+--}}
 <section>
     <header>
         <h2 class="text-lg font-medium text-gray-900">

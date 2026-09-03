@@ -225,3 +225,9 @@
         <span x-show="open" x-cloak>✕</span>
     </button>
 </div>
+
+{{--
+    Tombol dan panel chat yang dapat dibuka dari halaman mana pun.
+    State Alpine mengatur visibilitas panel, indikator mengetik, dan daftar pesan;
+    pengiriman pesan dilakukan ke endpoint JSON ChatController.
+--}}

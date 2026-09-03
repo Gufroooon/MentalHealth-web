@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Test aplikasi.
+ *
+ * Menjelaskan tanggung jawab file tests/Feature/ProfileTest.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+ */
+
 namespace Tests\Feature;
 
 use App\Models\User;

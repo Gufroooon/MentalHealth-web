@@ -1,16 +1,23 @@
 <?php
 
+/**
+ * Dokumentasi file: Service business logic.
+ *
+ * Membaca tren komunitas yang sudah diagregasi tanpa membuka data individual user.
+ */
+
 namespace App\Services;
 
-use App\Models\DailyCheckin;
-use App\Models\Profile;
 use App\Models\PulseAggregate;
 use Carbon\Carbon;
 
 class PulseService
 {
     /**
-     * Get community pulse trends data for the given role filter
+     * Mengambil agregasi tren komunitas untuk minggu dan role tertentu.
+     * Query hanya membaca PulseAggregate yang sudah diringkas sehingga UI
+     * tidak menerima identitas atau detail check-in individu. Jika agregat
+     * minggu berjalan belum tersedia, service memakai beberapa agregat terbaru.
      */
     public function getCommunityPulse(string $roleFilter = 'all'): array
     {
@@ -21,12 +28,13 @@ class PulseService
             ->where('week_number', $currentWeek)
             ->where(function ($q) use ($roleFilter) {
                 $q->where('role_filter', $roleFilter)
-                  ->orWhere('role_filter', 'all');
+                    ->orWhere('role_filter', 'all');
             })
             ->get();
 
         if ($aggregates->isEmpty()) {
-            // Fallback to recent aggregates
+            // Fallback membuat halaman tetap informatif saat proses agregasi
+            // minggu berjalan belum menghasilkan baris baru.
             $aggregates = PulseAggregate::orderBy('year', 'desc')
                 ->orderBy('week_number', 'desc')
                 ->take(10)

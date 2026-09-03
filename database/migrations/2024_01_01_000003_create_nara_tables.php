@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Migration struktur database.
+ *
+ * Membentuk seluruh tabel domain NARA beserta foreign key, index, dan aturan cascade.
+ */
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -11,14 +17,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        // 1. Add avatar to users if not exists
-        if (!Schema::hasColumn('users', 'avatar')) {
+        // Tambahkan avatar secara aman karena migration ini dapat dijalankan
+        // pada database yang sebagian sudah pernah menerima kolom tersebut.
+        if (! Schema::hasColumn('users', 'avatar')) {
             Schema::table('users', function (Blueprint $table) {
                 $table->string('avatar')->nullable()->after('password');
             });
         }
 
-        // 2. User Profiles
+        // Profile menyimpan role, tanggal lahir, pilihan Pulse, dan settings
+        // yang melengkapi tabel users tanpa mencampur data autentikasi.
         Schema::create('profiles', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
@@ -29,7 +37,8 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 3. Daily Check-ins
+        // DailyCheckin menyimpan ringkasan skor per user per tanggal. Unique
+        // user_id+date mencegah dua check-in untuk hari yang sama.
         Schema::create('daily_checkins', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
@@ -47,39 +56,41 @@ return new class extends Migration
             $table->index(['user_id', 'date']);
         });
 
-        // 4. Detailed Life Signals (Sub-metrics)
+        // LifeSignal menyimpan metrik mentah yang menjadi bahan perhitungan
+        // skor serta analisis pola tidur, stres, sosial, dan beban hidup.
         Schema::create('life_signals', function (Blueprint $table) {
             $table->id();
             $table->foreignId('checkin_id')->constrained('daily_checkins')->cascadeOnDelete();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            
+
             // Body Vector
             $table->decimal('sleep_hours', 4, 1)->default(7.0);
             $table->unsignedTinyInteger('sleep_quality')->default(70); // 0-100
             $table->unsignedSmallInteger('physical_activity_min')->default(15);
             $table->unsignedTinyInteger('energy_level')->default(70); // 0-100
-            
+
             // Mind Vector
             $table->unsignedTinyInteger('stress_level')->default(30); // 0-100 (higher = more stress)
             $table->unsignedTinyInteger('focus_level')->default(70); // 0-100
             $table->unsignedTinyInteger('overthinking_level')->default(30); // 0-100
             $table->unsignedTinyInteger('mood_level')->default(70); // 0-100
-            
+
             // Social Vector
             $table->unsignedTinyInteger('social_interaction_score')->default(70); // 0-100
             $table->unsignedTinyInteger('loneliness_score')->default(20); // 0-100
             $table->unsignedTinyInteger('relationship_friction_score')->default(10); // 0-100
-            
+
             // Life Vector
             $table->unsignedTinyInteger('workload_score')->default(40); // 0-100
             $table->unsignedTinyInteger('financial_pressure_score')->default(30); // 0-100
             $table->unsignedTinyInteger('goal_progress_score')->default(60); // 0-100
-            
+
             $table->timestamps();
             $table->index(['user_id', 'created_at']);
         });
 
-        // 5. Life Events (Deadlines, exams, milestones)
+        // LifeEvent menjadi timeline agenda yang dibandingkan Pattern Engine
+        // dengan kondisi check-in sebelum tanggal event.
         Schema::create('life_events', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
@@ -209,7 +220,8 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 15. Reflection Journals (User's responses to reflection prompts)
+        // Jurnal menyimpan jawaban user dan snapshot prompt agar konteks lama
+        // tetap terbaca walau rule knowledge base berubah.
         Schema::create('reflection_journals', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
@@ -224,7 +236,7 @@ return new class extends Migration
             $table->index(['user_id', 'created_at']);
         });
 
-        // 16. Privacy Logs
+        // PrivacyLog menjadi audit trail untuk export, toggle, delete, dan wipe.
         Schema::create('privacy_logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
@@ -234,7 +246,8 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 17. Micro-Action Completed Logs (One Small Thing tracker)
+        // Log micro-action menyimpan satu aksi kecil per hari dan status
+        // penyelesaiannya untuk ditampilkan kembali di dashboard.
         Schema::create('micro_action_logs', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();

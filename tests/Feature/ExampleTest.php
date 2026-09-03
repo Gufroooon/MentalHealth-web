@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Test aplikasi.
+ *
+ * Menjelaskan tanggung jawab file tests/Feature/ExampleTest.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+ */
+
 namespace Tests\Feature;
 
 // use Illuminate\Foundation\Testing\RefreshDatabase;

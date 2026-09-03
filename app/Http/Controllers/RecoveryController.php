@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Controller HTTP.
+ *
+ * Menjelaskan tanggung jawab file app/Http/Controllers/RecoveryController.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+ */
+
 namespace App\Http\Controllers;
 
 use App\Models\RecoveryActivity;
@@ -13,6 +19,10 @@ class RecoveryController extends Controller
         protected RecoveryService $recoveryService
     ) {}
 
+    /**
+     * Menampilkan profil ranking recovery dan katalog aktivitas untuk user.
+     * Data dihitung RecoveryService dari sesi milik user sendiri.
+     */
     public function index()
     {
         $user = Auth::user();
@@ -24,6 +34,10 @@ class RecoveryController extends Controller
 
     /**
      * Log a new recovery session
+     */
+    /**
+     * Memvalidasi hasil eksperimen recovery sebelum mencatat perubahan energi
+     * dan mood ke RecoveryService, lalu kembali ke halaman Recovery Lab.
      */
     public function storeSession(Request $request)
     {
@@ -45,6 +59,9 @@ class RecoveryController extends Controller
 
     /**
      * Add new custom recovery activity
+     */
+    /**
+     * Menambahkan aktivitas recovery baru ke katalog setelah validasi input.
      */
     public function storeActivity(Request $request)
     {

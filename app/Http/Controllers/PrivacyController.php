@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Controller HTTP.
+ *
+ * Menyediakan kontrol export, penghapusan, dan partisipasi data yang berkaitan dengan privasi user.
+ */
+
 namespace App\Http\Controllers;
 
 use App\Models\DailyCheckin;
@@ -12,6 +18,10 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class PrivacyController extends Controller
 {
+    /**
+     * Menampilkan status privasi, daftar check-in, dan histori tindakan user.
+     * Profile dibuat bila belum ada agar toggle Pulse selalu memiliki record.
+     */
     public function index()
     {
         $user = Auth::user();
@@ -23,14 +33,15 @@ class PrivacyController extends Controller
     }
 
     /**
-     * Toggle anonymized Pulse participation
+     * Membalik pilihan user untuk ikut atau tidak ikut tren Pulse anonim.
+     * Perubahan dan metadata request dicatat di PrivacyLog untuk audit.
      */
     public function togglePulse(Request $request)
     {
         $user = Auth::user();
         $profile = $user->profile ?? Profile::firstOrCreate(['user_id' => $user->id]);
-        
-        $profile->participate_pulse = !$profile->participate_pulse;
+
+        $profile->participate_pulse = ! $profile->participate_pulse;
         $profile->save();
 
         PrivacyLog::create([
@@ -41,16 +52,19 @@ class PrivacyController extends Controller
         ]);
 
         $statusText = $profile->participate_pulse ? 'diaktifkan' : 'dinonaktifkan';
+
         return redirect()->route('privacy.index')->with('success', "Partisipasi data anonim ke Tren Komunitas (Pulse) berhasil {$statusText}.");
     }
 
     /**
-     * Export all user data as JSON
+     * Mengumpulkan seluruh data domain milik user ke response JSON download.
+     * Relationship signal, activity, member, dan data lain dimuat agar export
+     * dapat dipakai user sebagai salinan lengkap; tindakan export dicatat.
      */
     public function exportJson(Request $request)
     {
         $user = Auth::user();
-        
+
         $data = [
             'app' => 'NARA - Life Pattern Companion',
             'exported_at' => now()->toIso8601String(),
@@ -75,14 +89,17 @@ class PrivacyController extends Controller
             'user_agent' => $request->userAgent(),
         ]);
 
-        $fileName = 'nara_data_export_' . date('Y_m_d_His') . '.json';
+        $fileName = 'nara_data_export_'.date('Y_m_d_His').'.json';
+
         return response()->json($data, 200, [
             'Content-Disposition' => "attachment; filename=\"{$fileName}\"",
         ]);
     }
 
     /**
-     * Export checkins as CSV
+     * Mengalirkan check-in dan metrik signal sebagai CSV.
+     * Header kolom menjelaskan format file, lalu setiap baris mewakili satu
+     * tanggal check-in dan memakai tanda '-' untuk signal yang belum ada.
      */
     public function exportCsv(Request $request): StreamedResponse
     {
@@ -95,7 +112,7 @@ class PrivacyController extends Controller
             'user_agent' => $request->userAgent(),
         ]);
 
-        $fileName = 'nara_checkins_' . date('Y_m_d_His') . '.csv';
+        $fileName = 'nara_checkins_'.date('Y_m_d_His').'.csv';
 
         $headers = [
             'Content-Type' => 'text/csv',
@@ -104,12 +121,12 @@ class PrivacyController extends Controller
 
         return response()->stream(function () use ($user) {
             $handle = fopen('php://output', 'w');
-            
+
             // CSV Header
             fputcsv($handle, [
                 'Tanggal', 'Skor Keseluruhan', 'Mind Score', 'Body Score', 'Social Score', 'Life Score',
                 'Jam Tidur', 'Kualitas Tidur', 'Energi', 'Stres', 'Fokus', 'Overthinking',
-                'Interaksi Sosial', 'Kesepian', 'Beban Kerja', 'Tekanan Finansial', 'Catatan'
+                'Interaksi Sosial', 'Kesepian', 'Beban Kerja', 'Tekanan Finansial', 'Catatan',
             ]);
 
             $checkins = DailyCheckin::with('signal')
@@ -171,7 +188,7 @@ class PrivacyController extends Controller
     public function wipeData(Request $request)
     {
         $user = Auth::user();
-        
+
         // Log wipe
         PrivacyLog::create([
             'user_id' => $user->id,

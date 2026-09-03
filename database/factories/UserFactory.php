@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Entry point aplikasi.
+ *
+ * Menjelaskan tanggung jawab file database/factories/UserFactory.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+ */
+
 namespace Database\Factories;
 
 use App\Models\User;

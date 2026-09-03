@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * Dokumentasi file: Definisi route Laravel.
+ *
+ * Menentukan endpoint landing page, dashboard, modul NARA, dan perlindungan middleware auth/verified.
+ */
+
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CheckinController;
 use App\Http\Controllers\CircleController;
 use App\Http\Controllers\DashboardController;
@@ -11,14 +18,19 @@ use App\Http\Controllers\RecoveryController;
 use App\Http\Controllers\ReflectionController;
 use Illuminate\Support\Facades\Route;
 
+// Landing page publik. Route ini tidak memakai auth karena menjadi pintu
+// pertama sebelum pengunjung login atau mendaftar.
 Route::get('/', function () {
     return view('welcome');
 });
 
+// Semua endpoint di bawah membutuhkan session login dan email terverifikasi.
+// Pembatasan ini penting karena route membaca atau mengubah data kesejahteraan
+// pribadi milik user yang sedang aktif.
 Route::middleware(['auth', 'verified'])->group(function () {
     // 1. Dashboard & Life Signal Engine
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    
+
     // Check-in & Micro-actions
     Route::post('/checkin', [CheckinController::class, 'store'])->name('checkin.store');
     Route::post('/micro-action/{microAction}/toggle', [CheckinController::class, 'toggleMicroAction'])->name('micro-action.toggle');
@@ -48,9 +60,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('/reflection', [ReflectionController::class, 'store'])->name('reflection.store');
 
     // 9.b Interactive Chatbot Assistant (Tanya NARA)
-    Route::get('/chat', [\App\Http\Controllers\ChatController::class, 'index'])->name('chat.index');
-    Route::post('/chat/send', [\App\Http\Controllers\ChatController::class, 'send'])->name('chat.send');
-    Route::post('/chat/clear', [\App\Http\Controllers\ChatController::class, 'clear'])->name('chat.clear');
+    Route::get('/chat', [ChatController::class, 'index'])->name('chat.index');
+    Route::post('/chat/send', [ChatController::class, 'send'])->name('chat.send');
+    Route::post('/chat/clear', [ChatController::class, 'clear'])->name('chat.clear');
 
     // 10. Privacy Center & Data Control
     Route::get('/privacy', [PrivacyController::class, 'index'])->name('privacy.index');

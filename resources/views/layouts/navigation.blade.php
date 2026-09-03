@@ -126,3 +126,9 @@
         </div>
     </div>
 </nav>
+
+{{--
+    Navigasi ini menjadi titik akses utama ke dashboard dan modul NARA.
+    Link memakai named route agar perubahan URL tidak perlu diulang di banyak view,
+    sementara state Alpine mengatur menu pada layar kecil.
+--}}

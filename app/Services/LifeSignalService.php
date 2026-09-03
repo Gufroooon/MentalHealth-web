@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Service business logic.
+ *
+ * Mengubah input check-in menjadi skor Mind, Body, Social, Life, dan Overall lalu menyimpannya bersama detail sinyal.
+ */
+
 namespace App\Services;
 
 use App\Models\DailyCheckin;
@@ -7,19 +13,31 @@ use App\Models\LifeSignal;
 use App\Models\MicroActionLog;
 use App\Models\User;
 use Carbon\Carbon;
+use Illuminate\Database\UniqueConstraintViolationException;
 use Illuminate\Support\Facades\DB;
 
 class LifeSignalService
 {
     /**
-     * Calculate 4-vector scores and save daily checkin + life signal
+     * Menghitung skor kesejahteraan harian dari data form check-in.
+     *
+     * Input berasal dari CheckinController dan berisi sinyal rinci tubuh,
+     * pikiran, sosial, serta kehidupan. Setiap vector dihitung dengan bobot
+     * yang sudah ditentukan, lalu empat vector dirata-ratakan menjadi skor
+     * keseluruhan dan diberi primary tag yang paling relevan.
+     *
+     * DailyCheckin menyimpan skor ringkas untuk dashboard, sedangkan
+     * LifeSignal menyimpan metrik mentah agar dapat dipakai analisis pola.
+     * Keduanya ditulis dalam satu transaction supaya tidak terjadi kondisi
+     * check-in tersimpan tanpa detail sinyal atau sebaliknya.
      */
     public function recordCheckin(User $user, array $data, ?string $date = null): DailyCheckin
     {
         $date = $date ?? Carbon::today()->toDateString();
 
-        // 1. Calculate Mind Score (0 - 100)
-        // Formula: mood (35%) + focus (30%) + (100 - stress)*20% + (100 - overthink)*15%
+        // Skor Mind memberi bobot terbesar pada mood dan fokus. Stres serta
+        // overthinking dibalik (100 - nilai) karena nilai tinggi pada dua
+        // metrik tersebut berarti kondisi pikiran semakin berat.
         $mood = (int) ($data['mood_level'] ?? 70);
         $focus = (int) ($data['focus_level'] ?? 70);
         $stress = (int) ($data['stress_level'] ?? 30);
@@ -33,8 +51,9 @@ class LifeSignalService
             1
         );
 
-        // 2. Calculate Body Score (0 - 100)
-        // Formula: sleep_quality (35%) + energy (35%) + min(100, physical_activity*2.5) (15%) + min(100, (sleep_hours/8)*100) (15%)
+        // Skor Body menggabungkan kualitas tidur, energi, aktivitas fisik,
+        // dan durasi tidur. Aktivitas dibatasi maksimal 100 agar olahraga
+        // yang sangat lama tidak mendominasi vector ini.
         $sleepHours = (float) ($data['sleep_hours'] ?? 7.0);
         $sleepQuality = (int) ($data['sleep_quality'] ?? 70);
         $energy = (int) ($data['energy_level'] ?? 70);
@@ -51,8 +70,9 @@ class LifeSignalService
             1
         );
 
-        // 3. Calculate Social Score (0 - 100)
-        // Formula: social_interaction (50%) + (100 - loneliness)*30% + (100 - friction)*20%
+        // Skor Social menganggap interaksi sebagai sinyal utama. Kesepian
+        // dan friksi hubungan dibalik karena nilai tinggi menunjukkan beban
+        // sosial yang lebih besar, bukan kondisi yang lebih baik.
         $socialInteraction = (int) ($data['social_interaction_score'] ?? 70);
         $loneliness = (int) ($data['loneliness_score'] ?? 20);
         $friction = (int) ($data['relationship_friction_score'] ?? 10);
@@ -64,8 +84,9 @@ class LifeSignalService
             1
         );
 
-        // 4. Calculate Life Score (0 - 100)
-        // Formula: goal_progress (45%) + (100 - workload)*30% + (100 - financial_pressure)*25%
+        // Skor Life menggabungkan kemajuan tujuan dengan beban kerja dan
+        // tekanan finansial. Dua tekanan terakhir dibalik agar skor tinggi
+        // selalu berarti keadaan yang lebih sehat atau terkendali.
         $goalProgress = (int) ($data['goal_progress_score'] ?? 60);
         $workload = (int) ($data['workload_score'] ?? 40);
         $financialPressure = (int) ($data['financial_pressure_score'] ?? 30);
@@ -77,10 +98,12 @@ class LifeSignalService
             1
         );
 
-        // Overall Wellbeing Score (0 - 100)
+        // Semua vector memiliki rentang yang sama, sehingga rata-rata
+        // sederhana dipakai sebagai indikator keseluruhan yang mudah dibaca.
         $overallScore = round(($mindScore + $bodyScore + $socialScore + $lifeScore) / 4, 1);
 
-        // Determine Primary Tag
+        // Tag dipilih berurutan. Kondisi risiko yang lebih spesifik mendapat
+        // prioritas sebelum label positif berdasarkan skor keseluruhan.
         $primaryTag = 'Ritme Seimbang';
         if ($stress > 70 || $overthink > 75) {
             $primaryTag = 'Pikiran Penuh';
@@ -94,6 +117,9 @@ class LifeSignalService
             $primaryTag = 'Kondisi Prima';
         }
 
+        // Simpan ringkasan dan sinyal rinci secara atomik. updateOrCreate
+        // membuat request pada tanggal yang sama bersifat idempotent: submit
+        // ulang akan memperbarui check-in hari itu, bukan menggandakan baris.
         return DB::transaction(function () use (
             $user, $date, $mindScore, $bodyScore, $socialScore, $lifeScore,
             $overallScore, $data, $primaryTag, $sleepHours, $sleepQuality,
@@ -140,7 +166,16 @@ class LifeSignalService
     }
 
     /**
-     * Get recent signal history for charts (e.g. last 14 days)
+     * Mengambil histori check-in user untuk data chart dan analisis.
+     *
+     * Query memuat relationship signal agar skor ringkas dan metrik mentah
+     * tersedia dalam satu rangkaian data. Hasil dikembalikan dalam array
+     * seri chart, lengkap dengan raw_checkins untuk komponen yang membutuhkan
+     * data model aslinya.
+     *
+     * @param  User  $user  Pemilik data yang boleh dibaca
+     * @param  int  $days  Jumlah hari mundur, termasuk hari ini
+     * @return array Seri label, vector, sinyal tubuh, dan model check-in mentah
      */
     public function getSignalHistory(User $user, int $days = 14): array
     {
@@ -187,7 +222,9 @@ class LifeSignalService
     }
 
     /**
-     * Get today's or latest checkin and signal
+     * Mengambil check-in terbaru milik user beserta detail LifeSignal-nya.
+     * Data ini menjadi konteks utama dashboard, chat, dan pemilihan rule
+     * refleksi ketika user belum mengirim check-in pada hari berjalan.
      */
     public function getLatestCheckin(User $user): ?DailyCheckin
     {
@@ -198,7 +235,10 @@ class LifeSignalService
     }
 
     /**
-     * Find lowest signal vector for today's micro-action
+     * Menentukan vector dengan skor terendah dari sebuah check-in.
+     * Vector terlemah dipakai sebagai dasar rekomendasi One Small Thing,
+     * sehingga micro-action diarahkan ke area yang paling membutuhkan
+     * perhatian, bukan dipilih secara acak.
      */
     public function getLowestSignalVector(DailyCheckin $checkin): array
     {
@@ -229,7 +269,7 @@ class LifeSignalService
             ],
         ];
 
-        uasort($vectors, fn($a, $b) => $a['score'] <=> $b['score']);
+        uasort($vectors, fn ($a, $b) => $a['score'] <=> $b['score']);
         $lowestKey = array_key_first($vectors);
 
         return [
@@ -240,12 +280,17 @@ class LifeSignalService
     }
 
     /**
-     * Get or generate today's One Small Thing micro-action
+     * Mengambil atau membuat satu micro-action untuk hari ini.
+     *
+     * Jika check-in tersedia, vector terendah menentukan kelompok aksi.
+     * Jika belum ada check-in, body dipakai sebagai default agar dashboard
+     * tetap memiliki saran. Aksi disimpan sekali per user per tanggal dan
+     * dikembalikan bersama status penyelesaiannya.
      */
     public function getTodayMicroAction(User $user, ?DailyCheckin $latestCheckin): array
     {
         $today = Carbon::today()->toDateString();
-        
+
         // Default micro action pool per lowest vector
         $vectorKey = 'body';
         if ($latestCheckin) {
@@ -279,12 +324,12 @@ class LifeSignalService
         $actions = $microActions[$vectorKey] ?? $microActions['body'];
         $selectedAction = $actions[array_rand($actions)];
 
-        // Use whereDate() so it matches both '2026-09-03' and '2026-09-03 00:00:00' in SQLite
+       
         $log = MicroActionLog::where('user_id', $user->id)
             ->whereDate('date', $today)
             ->first();
 
-        if (!$log) {
+        if (! $log) {
             try {
                 $log = MicroActionLog::create([
                     'user_id' => $user->id,
@@ -293,7 +338,7 @@ class LifeSignalService
                     'category' => $vectorKey,
                     'is_completed' => false,
                 ]);
-            } catch (\Illuminate\Database\UniqueConstraintViolationException $e) {
+            } catch (UniqueConstraintViolationException $e) {
                 // Seeder or concurrent request already inserted with datetime format — fetch it
                 $log = MicroActionLog::where('user_id', $user->id)
                     ->whereDate('date', $today)
@@ -302,7 +347,7 @@ class LifeSignalService
         }
 
         // Ultimate null guard: return a default action so dashboard never crashes
-        if (!$log) {
+        if (! $log) {
             return [
                 'id' => null,
                 'title' => $selectedAction,

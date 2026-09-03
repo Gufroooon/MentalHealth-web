@@ -358,3 +358,9 @@ aria-modal="true">
         </div>
     </div>
 </div>
+
+{{--
+    Modal interaktif untuk mengirim sinyal Mind, Body, Social, dan Life.
+    Nilai awal diambil dari check-in terbaru agar form dapat dipakai untuk
+    memperbarui data hari ini, bukan hanya membuat data baru.
+--}}

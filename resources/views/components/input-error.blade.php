@@ -1,3 +1,8 @@
+{{--
+    Dokumentasi file: View Blade.
+
+    Menjelaskan tanggung jawab file resources/views/components/input-error.blade.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+--}}
 @props(['messages'])
 
 @if ($messages)

@@ -53,3 +53,9 @@
         </form>
     </x-modal>
 </section>
+
+{{--
+    Form ini meminta konfirmasi password sebelum akun dihapus permanen.
+    Perlindungan tersebut mencegah penghapusan tidak sengaja ketika session
+    masih terbuka di perangkat yang digunakan bersama.
+--}}

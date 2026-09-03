@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: FormRequest validasi dan otorisasi.
+ *
+ * Menjelaskan tanggung jawab file app/Http/Requests/Auth/LoginRequest.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+ */
+
 namespace App\Http\Requests\Auth;
 
 use Illuminate\Auth\Events\Lockout;

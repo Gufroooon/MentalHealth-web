@@ -1,3 +1,8 @@
+/**
+ * Konfigurasi Tailwind untuk class pada Blade dan token visual aplikasi.
+ * Content menentukan file yang dipindai, sedangkan theme menambahkan font,
+ * warna vector sinyal, dan radius komponen yang dipakai UI NARA.
+ */
 import defaultTheme from 'tailwindcss/defaultTheme';
 import forms from '@tailwindcss/forms';
 

@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Migration struktur database.
+ *
+ * Menjelaskan tanggung jawab file database/migrations/2024_01_01_000004_create_chat_messages_table.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+ */
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;

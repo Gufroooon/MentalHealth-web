@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Konfigurasi Laravel.
+ *
+ * Menjelaskan tanggung jawab file config/app.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+ */
+
 return [
 
     /*

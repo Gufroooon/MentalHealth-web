@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Controller HTTP.
+ *
+ * Menampilkan riwayat chat dan menjembatani request browser dengan ChatService.
+ */
+
 namespace App\Http\Controllers;
 
 use App\Models\ChatMessage;
@@ -15,6 +21,10 @@ class ChatController extends Controller
         protected LifeSignalService $lifeSignalService
     ) {}
 
+    /**
+     * Menampilkan histori chat user dan membuat pesan pembuka saat histori kosong.
+     * Check-in terbaru ikut dikirim ke view sebagai konteks tampilan awal.
+     */
     public function index()
     {
         $user = Auth::user();
@@ -28,7 +38,7 @@ class ChatController extends Controller
             $welcome = ChatMessage::create([
                 'user_id' => $user->id,
                 'sender' => 'nara',
-                'message' => "Halo " . explode(' ', $user->name)[0] . "! 🌿 Aku NARA, teman pendamping kesejahteraan hidupmu.\n\nKamu bisa cerita apa saja tentang harimu, tumpukan tugas, overthinking, atau sekadar tanya rekomendasi cara rehat terbaik.\n\nAda hal yang mau diobrolin saat ini?",
+                'message' => 'Halo '.explode(' ', $user->name)[0]."! 🌿 Aku NARA, teman pendamping kesejahteraan hidupmu.\n\nKamu bisa cerita apa saja tentang harimu, tumpukan tugas, overthinking, atau sekadar tanya rekomendasi cara rehat terbaik.\n\nAda hal yang mau diobrolin saat ini?",
                 'quick_replies_json' => [
                     'Gua lagi stres & overthinking',
                     'Badan capek & kurang tidur',
@@ -46,7 +56,9 @@ class ChatController extends Controller
     }
 
     /**
-     * Send message to NARA chatbot via AJAX
+     * Menerima pesan chat dari browser, memvalidasinya, lalu memanggil
+     * ChatService. Response JSON hanya mengirim field yang diperlukan UI:
+     * id, sender, message, quick replies, dan waktu pesan.
      */
     public function send(Request $request)
     {
@@ -76,11 +88,13 @@ class ChatController extends Controller
     }
 
     /**
-     * Clear chat history
+     * Menghapus seluruh pesan chat milik user yang sedang login lalu kembali
+     * ke halaman chat dengan flash message.
      */
     public function clear(Request $request)
     {
         ChatMessage::where('user_id', Auth::id())->delete();
+
         return redirect()->route('chat.index')->with('success', 'Riwayat percakapan dengan NARA berhasil dibersihkan.');
     }
 }

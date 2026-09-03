@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Definisi route Laravel.
+ *
+ * Menentukan endpoint login, registrasi, verifikasi email, reset password, konfirmasi password, dan logout.
+ */
+
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\ConfirmablePasswordController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
@@ -11,6 +17,8 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use Illuminate\Support\Facades\Route;
 
+// Endpoint yang hanya boleh diakses pengunjung yang belum login, seperti
+// login, registrasi, dan permintaan reset password.
 Route::middleware('guest')->group(function () {
     Route::get('register', [RegisteredUserController::class, 'create'])
         ->name('register');
@@ -35,6 +43,8 @@ Route::middleware('guest')->group(function () {
         ->name('password.store');
 });
 
+// Endpoint lanjutan autentikasi untuk user yang sudah login, termasuk
+// verifikasi email, konfirmasi password, dan logout.
 Route::middleware('auth')->group(function () {
     Route::get('verify-email', EmailVerificationPromptController::class)
         ->name('verification.notice');

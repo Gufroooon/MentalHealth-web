@@ -1,6 +1,12 @@
 #!/usr/bin/env php
 <?php
 
+/**
+ * Dokumentasi file: Entry point command-line Laravel Artisan.
+ *
+ * File ini memuat bootstrap aplikasi dan menjalankan command dari terminal.
+ */
+
 use Illuminate\Foundation\Application;
 use Symfony\Component\Console\Input\ArgvInput;
 

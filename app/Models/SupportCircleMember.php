@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Dokumentasi file: Model Eloquent domain.
+ *
+ * Menjelaskan tanggung jawab file app/Models/SupportCircleMember.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+ */
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -25,6 +31,9 @@ class SupportCircleMember extends Model
         'last_pinged_at' => 'datetime',
     ];
 
+    /**
+     * Relationship belongsTo: member berada di satu SupportCircle. Relasi ini dipakai untuk memeriksa ownership sebelum perubahan data.
+     */
     public function circle(): BelongsTo
     {
         return $this->belongsTo(SupportCircle::class, 'circle_id');
