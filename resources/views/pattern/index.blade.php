@@ -2,6 +2,13 @@
     Dokumentasi file: View Blade.
 
     Menjelaskan tanggung jawab file resources/views/pattern/index.blade.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
+
+    CATATAN FIX:
+    Semua key pada $simulationResult sekarang menggunakan fallback (?? default)
+    karena controller (PatternController@index) bisa mengirim array yang tidak
+    lengkap saat data historis tidak cukup atau scenario key tidak match.
+    Ini mencegah error "Undefined array key" tapi TIDAK memperbaiki root cause
+    di controller — root cause tetap perlu dicek di sana.
 --}}
 <x-app-layout>
     <x-slot name="header">
@@ -40,7 +47,7 @@
         <!-- TAB 1: LIFE PATTERNS TIMELINE -->
         <!-- ========================================== -->
         <div x-show="tab === 'patterns'" class="space-y-6">
-            
+
             <!-- SAVED / DETECTED PATTERNS -->
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 @forelse ($patternData['saved_patterns'] as $pattern)
@@ -147,7 +154,7 @@
         <!-- TAB 2: "WHAT IF?" HABIT SIMULATOR -->
         <!-- ========================================== -->
         <div x-show="tab === 'simulator'" class="space-y-6">
-            
+
             <div class="bg-gradient-to-r from-purple-900 to-indigo-900 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden">
                 <div class="max-w-2xl">
                     <span class="text-xs font-bold uppercase tracking-widest text-purple-300">Deterministic Habit Simulator</span>
@@ -168,82 +175,91 @@
             </div>
 
             <!-- Simulation Result Card -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                
-                <!-- Main Comparison Graphic -->
-                <div class="lg:col-span-2 bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm">
-                    <div class="flex items-center justify-between mb-4">
-                        <div>
-                            <h4 class="text-lg font-bold text-slate-800">{{ $simulationResult['title'] }}</h4>
-                            <p class="text-xs text-slate-500">Target Metrik: <strong class="text-purple-700">{{ $simulationResult['target_metric_label'] }}</strong></p>
-                        </div>
-                        <span class="text-xs px-3 py-1 rounded-full bg-purple-50 text-purple-800 font-bold border border-purple-200">
-                            Potensi: {{ $simulationResult['potential_delta'] > 0 ? '+' : '' }}{{ $simulationResult['potential_delta'] }} {{ $simulationResult['unit'] }}
-                        </span>
-                    </div>
+            @if (!empty($simulationResult))
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
-                    <p class="text-xs text-slate-600 mb-6 leading-relaxed">
-                        {{ $simulationResult['explanation'] }}
-                    </p>
-
-                    <!-- Comparative Bar Visual -->
-                    <div class="space-y-4 bg-slate-50 p-5 rounded-2xl border border-slate-100">
-                        <div>
-                            <div class="flex justify-between text-xs font-semibold text-slate-600 mb-1">
-                                <span>Kondisi Rata-rata Saat Ini (Baseline)</span>
-                                <span class="font-bold text-slate-800">{{ $simulationResult['baseline_value'] }} {{ $simulationResult['unit'] }}</span>
+                    <!-- Main Comparison Graphic -->
+                    <div class="lg:col-span-2 bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <div>
+                                <h4 class="text-lg font-bold text-slate-800">{{ $simulationResult['title'] ?? 'Skenario Tidak Tersedia' }}</h4>
+                                <p class="text-xs text-slate-500">Target Metrik: <strong class="text-purple-700">{{ $simulationResult['target_metric_label'] ?? '-' }}</strong></p>
                             </div>
-                            <div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
-                                <div class="bg-slate-500 h-3 rounded-full" style="width: {{ min(100, $simulationResult['baseline_value']) }}%"></div>
-                            </div>
+                            <span class="text-xs px-3 py-1 rounded-full bg-purple-50 text-purple-800 font-bold border border-purple-200">
+                                Potensi: {{ ($simulationResult['potential_delta'] ?? 0) > 0 ? '+' : '' }}{{ $simulationResult['potential_delta'] ?? 0 }} {{ $simulationResult['unit'] ?? '' }}
+                            </span>
                         </div>
 
-                        <div>
-                            <div class="flex justify-between text-xs font-semibold text-purple-900 mb-1">
-                                <span class="flex items-center gap-1 font-bold">✨ Potensi Skenario Baru</span>
-                                <span class="font-black text-purple-700 text-sm">{{ $simulationResult['projected_value'] }} {{ $simulationResult['unit'] }}</span>
+                        <p class="text-xs text-slate-600 mb-6 leading-relaxed">
+                            {{ $simulationResult['explanation'] ?? 'Belum cukup data historis untuk skenario ini.' }}
+                        </p>
+
+                        <!-- Comparative Bar Visual -->
+                        <div class="space-y-4 bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                            <div>
+                                <div class="flex justify-between text-xs font-semibold text-slate-600 mb-1">
+                                    <span>Kondisi Rata-rata Saat Ini (Baseline)</span>
+                                    <span class="font-bold text-slate-800">{{ $simulationResult['baseline_value'] ?? 0 }} {{ $simulationResult['unit'] ?? '' }}</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-3 overflow-hidden">
+                                    <div class="bg-slate-500 h-3 rounded-full" style="width: {{ min(100, $simulationResult['baseline_value'] ?? 0) }}%"></div>
+                                </div>
                             </div>
-                            <div class="w-full bg-purple-100 rounded-full h-3 overflow-hidden">
-                                <div class="bg-gradient-to-r from-purple-600 to-indigo-600 h-3 rounded-full transition-all duration-700" style="width: {{ min(100, $simulationResult['projected_value']) }}%"></div>
+
+                            <div>
+                                <div class="flex justify-between text-xs font-semibold text-purple-900 mb-1">
+                                    <span class="flex items-center gap-1 font-bold">✨ Potensi Skenario Baru</span>
+                                    <span class="font-black text-purple-700 text-sm">{{ $simulationResult['projected_value'] ?? 0 }} {{ $simulationResult['unit'] ?? '' }}</span>
+                                </div>
+                                <div class="w-full bg-purple-100 rounded-full h-3 overflow-hidden">
+                                    <div class="bg-gradient-to-r from-purple-600 to-indigo-600 h-3 rounded-full transition-all duration-700" style="width: {{ min(100, $simulationResult['projected_value'] ?? 0) }}%"></div>
+                                </div>
                             </div>
+                        </div>
+
+                        <!-- Medical Disclaimer -->
+                        <div class="mt-5 p-3 rounded-xl bg-amber-50 border border-amber-200/60 text-[11px] text-amber-900 flex items-center gap-2">
+                            <span class="font-bold">⚠️ Catatan:</span>
+                            <span>{{ $simulationResult['disclaimer'] ?? 'Hasil simulasi bersifat estimasi, bukan saran medis.' }}</span>
                         </div>
                     </div>
 
-                    <!-- Medical Disclaimer -->
-                    <div class="mt-5 p-3 rounded-xl bg-amber-50 border border-amber-200/60 text-[11px] text-amber-900 flex items-center gap-2">
-                        <span class="font-bold">⚠️ Catatan:</span>
-                        <span>{{ $simulationResult['disclaimer'] }}</span>
+                    <!-- Simulation Metadata & Historical Evidence -->
+                    <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-800 mb-3">Bukti Data Historis Kamu</h4>
+
+                            <div class="space-y-3 text-xs">
+                                <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                                    <span class="text-slate-400 block text-[10px] uppercase font-bold">Hari Cocok di Riwayat</span>
+                                    <span class="text-xl font-extrabold text-slate-800">{{ $simulationResult['sample_days_count'] ?? 0 }} Hari</span>
+                                    <span class="text-[11px] text-slate-500 block">dari total {{ $simulationResult['total_historical_days'] ?? 0 }} hari check-in</span>
+                                </div>
+
+                                <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100">
+                                    <span class="text-slate-400 block text-[10px] uppercase font-bold">Peningkatan Persentase</span>
+                                    <span class="text-xl font-extrabold text-emerald-600">{{ ($simulationResult['potential_delta_percent'] ?? 0) > 0 ? '+' : '' }}{{ $simulationResult['potential_delta_percent'] ?? 0 }}%</span>
+                                    <span class="text-[11px] text-slate-500 block">estimasi efisiensi energi mental</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 border-t border-slate-100">
+                            <button @click="$dispatch('open-checkin')" class="w-full py-2.5 rounded-xl bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold text-center transition">
+                                Terapkan Pada Check-in Hari Ini
+                            </button>
+                        </div>
                     </div>
+
                 </div>
-
-                <!-- Simulation Metadata & Historical Evidence -->
-                <div class="bg-white rounded-3xl p-6 border border-slate-200/80 shadow-sm flex flex-col justify-between">
-                    <div>
-                        <h4 class="text-sm font-bold text-slate-800 mb-3">Bukti Data Historis Kamu</h4>
-                        
-                        <div class="space-y-3 text-xs">
-                            <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100">
-                                <span class="text-slate-400 block text-[10px] uppercase font-bold">Hari Cocok di Riwayat</span>
-                                <span class="text-xl font-extrabold text-slate-800">{{ $simulationResult['sample_days_count'] }} Hari</span>
-                                <span class="text-[11px] text-slate-500 block">dari total {{ $simulationResult['total_historical_days'] }} hari check-in</span>
-                            </div>
-
-                            <div class="p-3 rounded-2xl bg-slate-50 border border-slate-100">
-                                <span class="text-slate-400 block text-[10px] uppercase font-bold">Peningkatan Persentase</span>
-                                <span class="text-xl font-extrabold text-emerald-600">{{ $simulationResult['potential_delta_percent'] > 0 ? '+' : '' }}{{ $simulationResult['potential_delta_percent'] }}%</span>
-                                <span class="text-[11px] text-slate-500 block">estimasi efisiensi energi mental</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="pt-4 border-t border-slate-100">
-                        <button @click="$dispatch('open-checkin')" class="w-full py-2.5 rounded-xl bg-purple-700 hover:bg-purple-800 text-white text-xs font-bold text-center transition">
-                            Terapkan Pada Check-in Hari Ini
-                        </button>
-                    </div>
+            @else
+                <!-- Fallback saat controller tidak mengirim data simulasi sama sekali -->
+                <div class="bg-white rounded-3xl p-8 border border-slate-200 text-center">
+                    <span class="text-3xl block mb-2">📉</span>
+                    <h4 class="font-bold text-slate-800 mb-1">Data Simulasi Belum Tersedia</h4>
+                    <p class="text-xs text-slate-500">Belum cukup data check-in historis untuk skenario ini, atau skenario tidak ditemukan. Coba pilih skenario lain di atas.</p>
                 </div>
-
-            </div>
+            @endif
 
         </div>
 
