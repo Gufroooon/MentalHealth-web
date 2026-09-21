@@ -1,8 +1,124 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-/*
- * Dokumentasi file: Stylesheet frontend.
- *
- * Menentukan style global yang diproses Vite dan Tailwind.
- */
+
+@layer base {
+    :root {
+        color-scheme: light;
+        font-synthesis: none;
+        text-rendering: optimizeLegibility;
+        --nara-blue: #557FA8;
+        --nara-blue-deep: #436B92;
+        --nara-blue-dark: #263F59;
+        --nara-blue-surface: #F0F5FA;
+        --nara-white: #FFFFFF;
+        --nara-sand: #F4F7FB;
+        --nara-border: #E2E8F0;
+    }
+
+    html {
+        scroll-behavior: smooth;
+        background-color: #F4F7FB;
+    }
+
+    body {
+        background-color: #F4F7FB;
+        color: #1E293B;
+        font-family: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    a,
+    button,
+    input,
+    select,
+    textarea {
+        -webkit-tap-highlight-color: transparent;
+    }
+
+    button:focus-visible,
+    a:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+        outline: 2px solid #557FA8;
+        outline-offset: 2px;
+    }
+}
+
+[x-cloak] {
+    display: none !important;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+::-webkit-scrollbar-thumb {
+    background: #CBD5E1;
+    border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94A3B8;
+}
+
+/* Contained Hero & Banner Visuals (Blue & White) */
+.hero-contained {
+    background: linear-gradient(145deg, #5C85AD 0%, #4D769E 60%, #436B92 100%);
+    box-shadow: 0 20px 50px -10px rgba(33, 54, 74, 0.25);
+}
+
+.hero-glow {
+    background: radial-gradient(circle at 50% 15%, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0) 65%);
+}
+
+.nara-banner-blue {
+    background: linear-gradient(135deg, #557FA8 0%, #4D769E 50%, #436B92 100%);
+    color: #FFFFFF;
+}
+
+/* Glass & Soft Panel Styling */
+.nara-card {
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-radius: 1.5rem;
+    box-shadow: 0 4px 20px -2px rgba(30, 41, 59, 0.04);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.nara-card:hover {
+    box-shadow: 0 12px 30px -4px rgba(30, 41, 59, 0.08);
+}
+
+/* Smooth input styling */
+.nara-input {
+    border: 1px solid #CBD5E1;
+    border-radius: 1rem;
+    background-color: #FFFFFF;
+    color: #1E293B;
+    font-size: 0.875rem;
+    padding: 0.75rem 1rem;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.nara-input:focus {
+    border-color: #557FA8;
+    box-shadow: 0 0 0 3px rgba(85, 127, 168, 0.18);
+    outline: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}

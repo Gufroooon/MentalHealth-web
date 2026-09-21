@@ -1,8 +1,3 @@
-{{--
-    Dokumentasi file: View Blade.
-
-    Menjelaskan tanggung jawab file resources/views/components/text-input.blade.php serta hubungan data atau UI-nya dengan bagian aplikasi lain.
---}}
 @props(['disabled' => false])
 
-<input @disabled($disabled) {{ $attributes->merge(['class' => 'border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm']) }}>
+<input @disabled($disabled) {{ $attributes->merge(['class' => 'block w-full border-slate-200 focus:border-nara-500 focus:ring-nara-500 rounded-2xl shadow-none text-xs sm:text-sm p-3']) }}>
